@@ -1,0 +1,15 @@
+node_modules
+dist
+.git
+*.md
+!README.md
+coverage
+.nyc_output
+mlruns
+mlartifacts
+__pycache__
+*.pyc
+.env
+.env.*
+.vscode
+.idea

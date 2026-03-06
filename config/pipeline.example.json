@@ -1,7 +1,7 @@
 {
   "id": "llm-pipeline-001",
   "name": "LLM Training Pipeline",
-  "description": "End-to-end LLM training and deployment pipeline",
+  "description": "End-to-end LLM text classification training and deployment pipeline",
   "stages": [
     {
       "id": "preprocess",
@@ -10,7 +10,7 @@
       "module": {
         "type": "python",
         "entrypoint": "modules/preprocess/main.py",
-        "args": ["--input-path", "data/raw", "--output-path", "data/processed"]
+        "args": ["--dataset", "imdb", "--model-name", "distilbert-base-uncased", "--max-samples", "2000", "--max-length", "256", "--output-path", "data/processed"]
       },
       "timeout": 3600000
     },
@@ -21,7 +21,7 @@
       "module": {
         "type": "python",
         "entrypoint": "modules/train/main.py",
-        "args": ["--epochs", "10", "--learning-rate", "0.001"]
+        "args": ["--data-path", "data/processed", "--model-output", "models/model", "--model-name", "distilbert-base-uncased", "--epochs", "3", "--learning-rate", "2e-5", "--batch-size", "16"]
       },
       "dependencies": ["preprocess"],
       "timeout": 7200000,
@@ -37,13 +37,14 @@
       "type": "benchmark",
       "module": {
         "type": "python",
-        "entrypoint": "modules/benchmark/main.py"
+        "entrypoint": "modules/benchmark/main.py",
+        "args": ["--model-path", "models/model/best", "--data-path", "data/processed", "--accuracy-threshold", "0.70"]
       },
       "dependencies": ["train"],
       "condition": {
         "field": "accuracy",
         "operator": "gte",
-        "value": 0.85
+        "value": 0.70
       }
     },
     {
@@ -53,7 +54,7 @@
       "module": {
         "type": "python",
         "entrypoint": "modules/deploy/main.py",
-        "args": ["--target", "staging"]
+        "args": ["--model-path", "models/model/best", "--model-name", "llmops-text-classifier", "--target", "staging"]
       },
       "dependencies": ["benchmark"]
     }

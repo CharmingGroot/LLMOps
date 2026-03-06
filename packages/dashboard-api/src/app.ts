@@ -5,6 +5,7 @@
 import express, { type Express } from 'express';
 import { createHealthRouter } from './routes/health.js';
 import { createPipelineRouter } from './routes/pipelines.js';
+import { createModelRouter } from './routes/models.js';
 import { errorHandler } from './middleware/error-handler.js';
 
 export interface AppConfig {
@@ -27,6 +28,7 @@ export function createApp(config: AppConfig): Express {
   // Routes
   app.use('/api/health', createHealthRouter());
   app.use('/api/pipelines', createPipelineRouter({ trackingUri: config.trackingUri }));
+  app.use('/api/models', createModelRouter({ trackingUri: config.trackingUri }));
 
   // Error handler
   app.use(errorHandler);

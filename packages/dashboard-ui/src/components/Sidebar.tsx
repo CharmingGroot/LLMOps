@@ -11,6 +11,7 @@ interface SidebarProps {
 
 const NAV_ITEMS = [
   { id: 'dashboard', label: 'Dashboard' },
+  { id: 'models', label: 'Models' },
   { id: 'logs', label: 'Live Logs' },
 ];
 

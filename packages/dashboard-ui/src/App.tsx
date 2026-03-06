@@ -8,9 +8,17 @@ import { Header } from './components/Header.js';
 import { DashboardPage } from './pages/DashboardPage.js';
 import { RunDetailPage } from './pages/RunDetailPage.js';
 import { LogsPage } from './pages/LogsPage.js';
+import { ModelsPage } from './pages/ModelsPage.js';
 import { useWebSocket } from './hooks/use-websocket.js';
 
-type Page = 'dashboard' | 'run-detail' | 'logs';
+type Page = 'dashboard' | 'run-detail' | 'logs' | 'models';
+
+const PAGE_TITLES: Record<Page, string> = {
+  dashboard: 'Dashboard',
+  'run-detail': 'Run Detail',
+  logs: 'Live Logs',
+  models: 'Model Registry',
+};
 
 export function App(): React.ReactElement {
   const [page, setPage] = useState<Page>('dashboard');
@@ -41,6 +49,8 @@ export function App(): React.ReactElement {
         );
       case 'logs':
         return <LogsPage lastEvent={lastEvent} />;
+      case 'models':
+        return <ModelsPage />;
       default:
         return <DashboardPage onSelectRun={handleSelectRun} />;
     }
@@ -53,7 +63,7 @@ export function App(): React.ReactElement {
         <Header
           wsStatus={wsStatus}
           onReconnect={reconnect}
-          title={page === 'run-detail' ? 'Run Detail' : page === 'logs' ? 'Live Logs' : 'Dashboard'}
+          title={PAGE_TITLES[page]}
         />
         <div className="content">
           {renderPage()}

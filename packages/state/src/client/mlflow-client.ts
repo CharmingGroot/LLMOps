@@ -15,6 +15,8 @@ import type {
   ListArtifactsRequest,
   ListArtifactsResponse,
   CreateExperimentRequest,
+  RegisteredModel,
+  ModelVersion,
 } from '@llmops/core';
 import { MLflowError, logError, logDebug } from '@llmops/core';
 
@@ -221,6 +223,95 @@ export class MLflowClient {
     // TODO: Implement actual file upload
     // For now, just set a tag indicating artifact location
     await this.setTag(runId, `artifact:${artifactPath || 'default'}`, localPath);
+  }
+
+  // ==================== Model Registry ====================
+
+  /**
+   * Create a registered model
+   */
+  async createRegisteredModel(name: string, description?: string): Promise<RegisteredModel> {
+    const response = await this.client.post('/registered-models/create', {
+      name,
+      description,
+    });
+    return response.data.registered_model;
+  }
+
+  /**
+   * Get a registered model by name
+   */
+  async getRegisteredModel(name: string): Promise<RegisteredModel> {
+    const response = await this.client.get('/registered-models/get', {
+      params: { name },
+    });
+    return response.data.registered_model;
+  }
+
+  /**
+   * List all registered models
+   */
+  async listRegisteredModels(maxResults: number = 100): Promise<RegisteredModel[]> {
+    const response = await this.client.get('/registered-models/list', {
+      params: { max_results: maxResults },
+    });
+    return response.data.registered_models || [];
+  }
+
+  /**
+   * Create a model version
+   */
+  async createModelVersion(
+    name: string,
+    source: string,
+    runId?: string,
+    description?: string
+  ): Promise<ModelVersion> {
+    const response = await this.client.post('/model-versions/create', {
+      name,
+      source,
+      run_id: runId,
+      description,
+    });
+    return response.data.model_version;
+  }
+
+  /**
+   * Get model version details
+   */
+  async getModelVersion(name: string, version: string): Promise<ModelVersion> {
+    const response = await this.client.get('/model-versions/get', {
+      params: { name, version },
+    });
+    return response.data.model_version;
+  }
+
+  /**
+   * List versions for a model
+   */
+  async getLatestVersions(name: string, stages?: string[]): Promise<ModelVersion[]> {
+    const response = await this.client.post('/registered-models/get-latest-versions', {
+      name,
+      stages,
+    });
+    return response.data.model_versions || [];
+  }
+
+  /**
+   * Transition model version stage
+   */
+  async transitionModelStage(
+    name: string,
+    version: string,
+    stage: 'Staging' | 'Production' | 'Archived' | 'None'
+  ): Promise<ModelVersion> {
+    const response = await this.client.post('/model-versions/transition-stage', {
+      name,
+      version,
+      stage,
+      archive_existing_versions: stage === 'Production',
+    });
+    return response.data.model_version;
   }
 
   /**

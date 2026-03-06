@@ -75,6 +75,28 @@ export interface ModelInfo {
 export type ModelStage = 'None' | 'Staging' | 'Production' | 'Archived';
 export type ModelStatus = 'PENDING_REGISTRATION' | 'READY';
 
+export interface RegisteredModel {
+  name: string;
+  creation_timestamp: number;
+  last_updated_timestamp: number;
+  description?: string;
+  latest_versions?: ModelVersion[];
+  tags?: Tag[];
+}
+
+export interface ModelVersion {
+  name: string;
+  version: string;
+  creation_timestamp: number;
+  last_updated_timestamp: number;
+  current_stage: ModelStage;
+  source: string;
+  run_id?: string;
+  status: ModelStatus;
+  description?: string;
+  tags?: Tag[];
+}
+
 export interface CreateExperimentRequest {
   name: string;
   artifactLocation?: string;

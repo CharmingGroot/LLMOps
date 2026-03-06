@@ -34,6 +34,8 @@ COPY packages/dashboard-api/src/ packages/dashboard-api/src/
 COPY packages/dashboard-api/tsconfig.json packages/dashboard-api/tsconfig.json
 COPY packages/dashboard-ui/src/ packages/dashboard-ui/src/
 COPY packages/dashboard-ui/tsconfig.json packages/dashboard-ui/tsconfig.json
+COPY packages/dashboard-ui/vite.config.ts packages/dashboard-ui/vite.config.ts
+COPY packages/dashboard-ui/index.html packages/dashboard-ui/index.html
 RUN pnpm build
 
 # ---------- api ----------
@@ -65,3 +67,11 @@ COPY modules/ modules/
 COPY config/ config/
 
 ENTRYPOINT ["node", "packages/cli/dist/index.js"]
+
+# ---------- dashboard-ui ----------
+FROM nginx:alpine AS dashboard-ui
+
+COPY --from=build /app/packages/dashboard-ui/dist/ /usr/share/nginx/html/
+COPY packages/dashboard-ui/nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 3000

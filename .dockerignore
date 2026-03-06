@@ -1,5 +1,5 @@
-node_modules
-dist
+**/node_modules
+**/dist
 .git
 *.md
 !README.md
@@ -13,3 +13,5 @@ __pycache__
 .env.*
 .vscode
 .idea
+.pnpmrc.json
+*.tsbuildinfo

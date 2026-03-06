@@ -3,7 +3,7 @@
  */
 
 import type { StageConfig, RunContext, StageResult, StageType } from '@llmops/core';
-import { logInfo, logError, PipelineEvent } from '@llmops/core';
+import { logInfo, logError } from '@llmops/core';
 import { RunManager } from '@llmops/state';
 
 export interface IStage {
@@ -68,7 +68,6 @@ export abstract class BaseStage implements IStage {
 
       return result;
     } catch (error) {
-      const duration = Date.now() - startTime;
       const err = error as Error;
 
       // Update stage status to failed
@@ -103,7 +102,7 @@ export abstract class BaseStage implements IStage {
   /**
    * Check if stage condition is met
    */
-  protected async checkCondition(config: StageConfig, context: RunContext): Promise<boolean> {
+  protected async checkCondition(config: StageConfig, _context: RunContext): Promise<boolean> {
     if (!config.condition) {
       return true;
     }

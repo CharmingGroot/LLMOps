@@ -2,8 +2,8 @@
  * Run Manager - Manages pipeline execution lifecycle
  */
 
-import type { PipelineConfig, StageType } from '@llmops/core';
-import { logInfo, logError, logDebug } from '@llmops/core';
+import type { PipelineConfig } from '@llmops/core';
+import { logInfo, logDebug } from '@llmops/core';
 import { MLflowClient } from '../client/mlflow-client.js';
 
 export class RunManager {
@@ -33,16 +33,17 @@ export class RunManager {
     );
 
     // Create run
+    const runName = `${config.name}_${new Date().toISOString()}`;
     const runId = await this.client.createRun({
       experimentId,
       startTime: Date.now(),
-      tags: {
-        'pipeline.id': config.id,
-        'pipeline.name': config.name,
-        'pipeline.triggered_by': triggeredBy,
-        'mlflow.runName': `${config.name}_${new Date().toISOString()}`,
-      },
-      runName: `${config.name}_${new Date().toISOString()}`,
+      tags: [
+        { key: 'pipeline.id', value: config.id },
+        { key: 'pipeline.name', value: config.name },
+        { key: 'pipeline.triggered_by', value: triggeredBy },
+        { key: 'mlflow.runName', value: runName },
+      ],
+      runName,
     });
 
     // Log pipeline parameters

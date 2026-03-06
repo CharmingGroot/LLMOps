@@ -2,8 +2,8 @@
  * Stream Handler - Captures and processes stdout/stderr
  */
 
-import type { RunContext, LogOutputEvent } from '@llmops/core';
-import { PipelineEvent, logInfo, logWarn, logError as logErr } from '@llmops/core';
+import type { RunContext } from '@llmops/core';
+import { logInfo, logWarn, logError as logErr } from '@llmops/core';
 
 export class StreamHandler {
   constructor(private context: RunContext) {}
@@ -18,16 +18,8 @@ export class StreamHandler {
       // Log to console
       logInfo(line, { runId: this.context.runId });
 
-      // Emit event for real-time streaming
-      const event: LogOutputEvent = {
-        runId: this.context.runId,
-        stageId: 'unknown', // Will be set by Stage
-        level: this.detectLogLevel(line),
-        message: line,
-        source: 'stdout',
-        timestamp: new Date(),
-      };
-      // this.context.events?.emit(PipelineEvent.LOG_OUTPUT, event);
+      // Event emission for real-time streaming (to be wired via EventBus)
+      // this.context.events?.emit(PipelineEvent.LOG_OUTPUT, { ... });
     }
   }
 
@@ -49,16 +41,8 @@ export class StreamHandler {
         logInfo(line, { runId: this.context.runId });
       }
 
-      // Emit event
-      const event: LogOutputEvent = {
-        runId: this.context.runId,
-        stageId: 'unknown',
-        level,
-        message: line,
-        source: 'stderr',
-        timestamp: new Date(),
-      };
-      // this.context.events?.emit(PipelineEvent.LOG_ERROR, event);
+      // Event emission for real-time streaming (to be wired via EventBus)
+      // this.context.events?.emit(PipelineEvent.LOG_ERROR, { ... });
     }
   }
 

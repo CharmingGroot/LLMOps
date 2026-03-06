@@ -38,7 +38,7 @@ export function createPipelineRouter(config: PipelineRouterConfig): Router {
   // GET /api/pipelines/runs/:runId - Get a specific run
   router.get('/runs/:runId', async (req: Request, res: Response) => {
     try {
-      const run = await client.getRun(req.params.runId);
+      const run = await client.getRun(req.params.runId as string);
       res.json({ run });
     } catch (error) {
       res.status(500).json({ error: getErrorMessage(error) });
@@ -49,7 +49,7 @@ export function createPipelineRouter(config: PipelineRouterConfig): Router {
   router.get('/runs/:runId/artifacts', async (req: Request, res: Response) => {
     try {
       const artifacts = await client.listArtifacts(
-        req.params.runId,
+        req.params.runId as string,
         req.query.path as string | undefined
       );
       res.json(artifacts);

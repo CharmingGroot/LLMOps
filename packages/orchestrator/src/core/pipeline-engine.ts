@@ -15,7 +15,6 @@ import {
   PipelineExecutionError,
   logInfo,
   logError,
-  PipelineEvent,
 } from '@llmops/core';
 import { RunManager } from '@llmops/state';
 import { StageRegistry } from '../registry/stage-registry.js';

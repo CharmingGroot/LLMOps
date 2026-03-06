@@ -3,6 +3,7 @@
  */
 
 import { z } from 'zod';
+import { StageType } from '../types/pipeline.js';
 import type { PipelineConfig, StageConfig, MLflowConfig } from '../types/pipeline.js';
 import { ValidationError } from './errors.js';
 
@@ -40,7 +41,7 @@ const retryPolicySchema = z.object({
 const stageConfigSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
-  type: z.enum(['preprocess', 'train', 'benchmark', 'deploy']),
+  type: z.nativeEnum(StageType),
   module: moduleConfigSchema,
   dependencies: z.array(z.string()).optional(),
   retryPolicy: retryPolicySchema.optional(),
@@ -63,7 +64,7 @@ const pipelineConfigSchema = z.object({
  */
 export function validatePipelineConfig(config: unknown): PipelineConfig {
   try {
-    return pipelineConfigSchema.parse(config);
+    return pipelineConfigSchema.parse(config) as PipelineConfig;
   } catch (error) {
     if (error instanceof z.ZodError) {
       throw new ValidationError(
@@ -80,7 +81,7 @@ export function validatePipelineConfig(config: unknown): PipelineConfig {
  */
 export function validateStageConfig(config: unknown): StageConfig {
   try {
-    return stageConfigSchema.parse(config);
+    return stageConfigSchema.parse(config) as StageConfig;
   } catch (error) {
     if (error instanceof z.ZodError) {
       throw new ValidationError(

@@ -4,7 +4,7 @@
 
 import express, { type Express } from 'express';
 import { createHealthRouter } from './routes/health.js';
-import { createPipelineRouter, type PipelineRouterConfig } from './routes/pipelines.js';
+import { createPipelineRouter } from './routes/pipelines.js';
 import { errorHandler } from './middleware/error-handler.js';
 
 export interface AppConfig {

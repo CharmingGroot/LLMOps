@@ -37,22 +37,12 @@ COPY packages/dashboard-ui/tsconfig.json packages/dashboard-ui/tsconfig.json
 RUN pnpm build
 
 # ---------- api ----------
-FROM base AS api
+FROM deps AS api
 
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/pnpm-lock.yaml ./
-COPY --from=deps /app/package.json ./
-COPY --from=deps /app/pnpm-workspace.yaml ./
-
-# Copy each package with its node_modules and dist
 COPY --from=build /app/packages/core/dist/ packages/core/dist/
-COPY --from=deps  /app/packages/core/package.json packages/core/package.json
 COPY --from=build /app/packages/state/dist/ packages/state/dist/
-COPY --from=deps  /app/packages/state/package.json packages/state/package.json
 COPY --from=build /app/packages/orchestrator/dist/ packages/orchestrator/dist/
-COPY --from=deps  /app/packages/orchestrator/package.json packages/orchestrator/package.json
 COPY --from=build /app/packages/dashboard-api/dist/ packages/dashboard-api/dist/
-COPY --from=deps  /app/packages/dashboard-api/package.json packages/dashboard-api/package.json
 
 COPY modules/ modules/
 COPY config/ config/
@@ -64,21 +54,12 @@ ENV MLFLOW_TRACKING_URI=http://mlflow:5000
 CMD ["node", "packages/dashboard-api/dist/server.js"]
 
 # ---------- cli ----------
-FROM base AS cli
-
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/pnpm-lock.yaml ./
-COPY --from=deps /app/package.json ./
-COPY --from=deps /app/pnpm-workspace.yaml ./
+FROM deps AS cli
 
 COPY --from=build /app/packages/core/dist/ packages/core/dist/
-COPY --from=deps  /app/packages/core/package.json packages/core/package.json
 COPY --from=build /app/packages/state/dist/ packages/state/dist/
-COPY --from=deps  /app/packages/state/package.json packages/state/package.json
 COPY --from=build /app/packages/orchestrator/dist/ packages/orchestrator/dist/
-COPY --from=deps  /app/packages/orchestrator/package.json packages/orchestrator/package.json
 COPY --from=build /app/packages/cli/dist/ packages/cli/dist/
-COPY --from=deps  /app/packages/cli/package.json packages/cli/package.json
 
 COPY modules/ modules/
 COPY config/ config/

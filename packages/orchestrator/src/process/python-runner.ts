@@ -2,9 +2,9 @@
  * Python Process Runner
  */
 
-import { spawn, type ChildProcess } from 'child_process';
+import { spawn } from 'child_process';
 import type { ModuleConfig, RunContext } from '@llmops/core';
-import { StageExecutionError, logInfo, logDebug, logError } from '@llmops/core';
+import { StageExecutionError, logInfo, logError } from '@llmops/core';
 import { StreamHandler } from './stream-handler.js';
 
 export interface ProcessResult {

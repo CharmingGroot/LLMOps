@@ -5,7 +5,6 @@
 import axios, { type AxiosInstance } from 'axios';
 import type {
   Run,
-  Experiment,
   CreateRunRequest,
   LogMetricRequest,
   LogParamRequest,
@@ -22,7 +21,7 @@ import { MLflowError, logError, logDebug } from '@llmops/core';
 export class MLflowClient {
   private readonly client: AxiosInstance;
 
-  constructor(private readonly trackingUri: string) {
+  constructor(trackingUri: string) {
     this.client = axios.create({
       baseURL: `${trackingUri}/api/2.0/mlflow`,
       timeout: 30000,
@@ -76,9 +75,7 @@ export class MLflowClient {
     const response = await this.client.post('/runs/create', {
       experiment_id: request.experimentId,
       start_time: request.startTime || Date.now(),
-      tags: request.tags
-        ? Object.entries(request.tags).map(([key, value]) => ({ key, value }))
-        : undefined,
+      tags: request.tags,
       run_name: request.runName,
     });
     const runId = response.data.run.info.run_id;

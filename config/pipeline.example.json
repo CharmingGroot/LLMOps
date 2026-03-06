@@ -1,0 +1,66 @@
+{
+  "id": "llm-pipeline-001",
+  "name": "LLM Training Pipeline",
+  "description": "End-to-end LLM training and deployment pipeline",
+  "stages": [
+    {
+      "id": "preprocess",
+      "name": "Data Preprocessing",
+      "type": "preprocess",
+      "module": {
+        "type": "python",
+        "entrypoint": "modules/preprocess/main.py",
+        "args": ["--input-path", "data/raw", "--output-path", "data/processed"]
+      },
+      "timeout": 3600000
+    },
+    {
+      "id": "train",
+      "name": "Model Training",
+      "type": "train",
+      "module": {
+        "type": "python",
+        "entrypoint": "modules/train/main.py",
+        "args": ["--epochs", "10", "--learning-rate", "0.001"]
+      },
+      "dependencies": ["preprocess"],
+      "timeout": 7200000,
+      "retryPolicy": {
+        "maxRetries": 2,
+        "backoff": "exponential",
+        "initialDelay": 5000
+      }
+    },
+    {
+      "id": "benchmark",
+      "name": "Model Benchmark",
+      "type": "benchmark",
+      "module": {
+        "type": "python",
+        "entrypoint": "modules/benchmark/main.py"
+      },
+      "dependencies": ["train"],
+      "condition": {
+        "field": "accuracy",
+        "operator": "gte",
+        "value": 0.85
+      }
+    },
+    {
+      "id": "deploy",
+      "name": "Model Deployment",
+      "type": "deploy",
+      "module": {
+        "type": "python",
+        "entrypoint": "modules/deploy/main.py",
+        "args": ["--target", "staging"]
+      },
+      "dependencies": ["benchmark"]
+    }
+  ],
+  "mlflow": {
+    "trackingUri": "http://localhost:5000",
+    "experimentName": "llm-training",
+    "artifactLocation": "s3://mlflow-artifacts/llm"
+  }
+}
